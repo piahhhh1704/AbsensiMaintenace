@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sistem Absensi Rapat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            color: #1a1a1a;
+            line-height: 1.6;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e88e5, #1565c0);
+            color: white;
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .form-title {
+            font-size: 1.1rem;
+            color: #1e88e5;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.375rem;
+            color: #424242;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        select, input[type="date"], input[type="text"], textarea {
+            width: 100%;
+            padding: 0.875rem;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: white;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        /* Styling untuk select di iOS */
+        select {
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23424242' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+
+        select:focus, input[type="date"]:focus, input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #1e88e5;
+            box-shadow: 0 0 0 2px rgba(30,136,229,0.1);
+        }
+
+        .button {
+            width: 100%;
+            background: #1e88e5;
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 0.5rem;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .button:active {
+            background: #1565c0;
+            transform: translateY(1px);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 0 -1rem;
+            padding: 0 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #f8f9fa;
+            color: #424242;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .badge-morning { background: #e3f2fd; color: #1565c0; }
+        .badge-afternoon { background: #fff3e0; color: #f57c00; }
+        .badge-present { background: #e8f5e9; color: #2e7d32; }
+        .badge-absent { background: #ffebee; color: #c62828; }
+        .badge-sick { background: #fff8e1; color: #ff8f00; }
+
+        /* Peningkatan untuk layar kecil */
+        @media (max-width: 480px) {
+            .container {
+                padding: 8px;
+            }
+
+            .header {
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .header h1 {
+                font-size: 1.25rem;
+            }
+
+            .card {
+                padding: 0.75rem;
+            }
+
+            th, td {
+                padding: 0.625rem;
+                font-size: 0.85rem;
+            }
+
+            .badge {
+                font-size: 0.75rem;
+                padding: 0.2rem 0.4rem;
+            }
+
+            select, input[type="date"], input[type="text"] {
+                font-size: 16px; /* Mencegah zoom di iOS */
+                padding: 0.75rem;
+            }
+
+            .form-title {
+                font-size: 1rem;
+            }
+
+            label {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Peningkatan untuk iPhone notch */
+        @supports (padding: max(0px)) {
+            .container {
+                padding-left: max(12px, env(safe-area-inset-left));
+                padding-right: max(12px, env(safe-area-inset-right));
+                padding-top: max(12px, env(safe-area-inset-top));
+            }
+        }
+
+        /* Mencegah pull-to-refresh di iOS */
+        html, body {
+            overscroll-behavior-y: contain;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sistem Absensi Rapat</h1>
+            <p>Maintenace</p>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2 class="form-title">Form Absensi</h2>
+                <form id="attendanceForm">
+                    <div class="form-group">
+                        <label for="date">Tanggal</label>
+                        <input type="date" id="date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="session">Sesi Rapat</label>
+                        <select id="session" required>
+                            <option value="">Pilih Sesi</option>
+                            <option value="pagi">Pagi (08:00 WIB)</option>
+                            <option value="sore">Sore (15:00 WIB)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">Nama Peserta</label>
+                        <select id="name" required>
+                            <option value="">Pilih Peserta</option>
+                            <option value="Tony">Tony</option>
+                            <option value="Sarminto">Sarminto</option>
+                            <option value="Bowo">Bowo</option>
+                            <option value="Arlana">Arlana</option>
+                            <option value="Sopiah">Sopiah</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Status Kehadiran</label>
+                        <select id="status" required onchange="toggleReason()">
+                            <option value="hadir">Hadir</option>
+                            <option value="tidak_hadir">Tidak Hadir</option>
+                            <option value="sakit">Sakit</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="reasonGroup" style="display: none;">
+                        <label for="reason">Alasan/Keterangan</label>
+                        <input type="text" id="reason" placeholder="Masukkan alasan">
+                    </div>
+
+                    <button type="submit" class="button">Simpan Absensi</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2 class="form-title">Riwayat Absensi</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Sesi</th>
+                                <th>Nama</th>
+                                <th>Status</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceHistory">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleReason() {
+            const status = document.getElementById('status').value;
+            const reasonGroup = document.getElementById('reasonGroup');
+            reasonGroup.style.display = status !== 'hadir' ? 'block' : 'none';
+        }
+
+        // Simpan data peserta yang sudah diabsen
+        const attendedParticipants = new Set();
+
+        document.getElementById('attendanceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const date = document.getElementById('date').value;
+            const session = document.getElementById('session').value;
+            const name = document.getElementById('name').value;
+            const status = document.getElementById('status').value;
+            const reason = document.getElementById('reason').value;
+            
+            // Cek apakah peserta sudah diabsen untuk tanggal dan sesi yang sama
+            const attendanceKey = `${date}-${session}-${name}`;
+            if (attendedParticipants.has(attendanceKey)) {
+                alert('Peserta ini sudah diabsen untuk tanggal dan sesi yang sama!');
+                return;
+            }
+
+            const tbody = document.getElementById('attendanceHistory');
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${new Date(date).toLocaleDateString('id-ID', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                })}</td>
+                <td>
+                    <span class="badge ${session === 'pagi' ? 'badge-morning' : 'badge-afternoon'}">
+                        ${session === 'pagi' ? 'Pagi (09:00)' : 'Sore (15:00)'}
+                    </span>
+                </td>
+                <td>${name}</td>
+                <td>
+                    <span class="badge ${
+                        status === 'hadir' ? 'badge-present' : 
+                        status === 'sakit' ? 'badge-sick' : 'badge-absent'
+                    }">
+                        ${status === 'hadir' ? 'Hadir' : 
+                          status === 'sakit' ? 'Sakit' : 'Tidak Hadir'}
+                    </span>
+                </td>
+                <td>${reason || '-'}</td>
+            `;
+            
+            tbody.insertBefore(tr, tbody.firstChild);
+
+            // Tambahkan ke Set peserta yang sudah diabsen
+            attendedParticipants.add(attendanceKey);
+
+            // Reset form kecuali tanggal dan sesi
+            document.getElementById('name').value = '';
+            document.getElementById('status').value = 'hadir';
+            document.getElementById('reason').value = '';
+            document.getElementById('reasonGroup').style.display = 'none';
+        });
+
+        // Cek apakah perangkat adalah iOS
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        
+        // Jika iOS, tambahkan class khusus untuk styling
+        if (isIOS) {
+            document.body.classList.add('ios-device');
+        }
+
+        // Mencegah bounce effect di iOS
+        document.body.addEventListener('touchmove', function(e) {
+            if (e.target.closest('.table-container')) return;
+            e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
